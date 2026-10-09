@@ -75,12 +75,18 @@ Page {
                 width: parent.width
                 height: 72
 
+                // com.nokia.meegos Switch hat **kein** clicked-Signal --
+                // nur checked. Ein onClicked daran laesst die ganze Seite
+                // nicht mehr laden ("Cannot assign to non-existent
+                // property"), und zwar erst auf dem Geraet: der Pruefer
+                // auf dem Baurechner hat die Bibliothek nicht und blendet
+                // genau diese Fehlerklasse aus.
                 Switch {
                     id: luft
                     x: 16
                     anchors.verticalCenter: parent.verticalCenter
                     checked: Settings.satelliteMap
-                    onClicked: Images.satellite = !Images.satellite
+                    onCheckedChanged: Images.satellite = checked
                 }
 
                 Label {

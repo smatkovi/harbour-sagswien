@@ -16,6 +16,7 @@ für das Jolla und für das Nokia N9/N950.
 * Karte mit Rasterkacheln von basemap.at, Stadtplan oder Luftbild
 * Eine neue Meldung aufgeben: Kategorie, Text, Ort (Satellit, Adresse
   oder auf der Karte gewählt) und Fotos aus der Galerie
+* Mitreden: einen Kommentar an eine Meldung schreiben
 
 ## Pakete
 
@@ -42,7 +43,17 @@ JSON, API, Bilder, Ortung, Texte); darüber liegen `qml/` mit Silica und
     tools/make-icons.py        die Startsymbole beider Systeme
     tools/qml-laden.sh         lädt jede Silica-Seite (auf dem Gerät)
     meego/tests/check-qml.sh   liest jede MeeGo-Seite mit Qt 4 ein
+    meego/tests/seiten-laden.sh  legt jede MeeGo-Seite **am N9/N950** an
     tests/run.sh               prüft den Meldungskörper, ohne ihn zu senden
+
+Die beiden MeeGo-Prüfer ergänzen einander und ersetzen sich nicht:
+`check-qml.sh` läuft auf dem Baurechner, hat `com.nokia.meego` aber nicht
+und blendet darum alle „is not a type"-Fehler aus — also genau die, die
+eine Eigenschaft betreffen, die es in dieser Fassung der Bibliothek nicht
+gibt. `seiten-laden.sh` legt jede Seite auf dem Gerät wirklich an und
+findet den Rest. Es hat prompt eins gefunden: `Switch` hat dort kein
+`clicked`, und ein `onClicked` daran ließ die Einstellungsseite gar nicht
+mehr aufgehen.
 
 ### Zwei Dinge, die nicht offensichtlich sind
 
@@ -53,9 +64,17 @@ gegen musl) — dieselbe Lösung wie bei Pass Viewer. Auf Sailfish genügt
 das System-Qt.
 
 **Es gibt keinen Testserver.** `PUT Meldung` legt eine echte Beschwerde
-beim Magistrat an. Beim Entwickeln wird dieser Weg nie abgeschickt;
-geprüft wird er über `Api::buildReport` in `tests/bodytest.cpp`, das
-denselben Körper baut und nur seine Form kontrolliert.
+beim Magistrat an, und ein Kommentar steht öffentlich an einer fremden
+Meldung. Beide Wege werden beim Entwickeln nie abgeschickt; geprüft
+werden sie über `Api::buildReport` und `Api::buildComment` in
+`tests/bodytest.cpp`, das dieselben Körper baut und nur ihre Form
+kontrolliert.
+
+**Kommentieren braucht keinen Schlüssel.** Die Schnittstelle der
+Original-App führt einen Kopf `ApiKey`, aber die einzige Aufrufstelle
+übergibt dafür `null` — Retrofit lässt den Kopf dann ganz weg. Am Dienst
+nachgemessen: ohne jeden Kopf antwortet er auf einen kaputten Körper mit
+HTTP 400, nicht mit 401 oder 403.
 
 ## Woher die Kenntnis stammt
 

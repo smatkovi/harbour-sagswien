@@ -89,6 +89,21 @@ public slots:
     // auf einem Telefon will man das nie (480 KB gegen 24 KB bei 400).
     QString imageUrl(const QString &imageId, int width) const;
 
+    // Einen Kommentar zu einer Meldung schreiben.
+    //
+    // **Es braucht keinen ApiKey.** Das Interface der Original-App fuehrt
+    // zwar einen Kopf `ApiKey` (nh2.java), aber die einzige Aufrufstelle
+    // uebergibt dafuer `null` (v8.java:268: `a(null, "", qh2Var, this)`),
+    // und Retrofit laesst einen Kopf mit null-Wert ganz weg. Am Dienst
+    // nachgemessen: `PUT Kommentar?type=` ohne jeden Kopf antwortet mit
+    // HTTP 400 auf einen kaputten Koerper, nicht mit 401 oder 403 -- es
+    // gibt also keine Sperre, nur die Modellpruefung.
+    //
+    // Dieselbe Vorsicht wie bei submitReport: es gibt keinen Testserver,
+    // ein Kommentar steht oeffentlich an einer fremden Meldung. Nur nach
+    // ausdruecklicher Bestaetigung des Nutzers aufrufen.
+    void submitComment(const QString &meldungId, const QString &text);
+
     // Eine Meldung abschicken.
     //
     // ACHTUNG: Es gibt keinen Testserver. Jede abgeschickte Meldung ist
@@ -115,6 +130,12 @@ public:
     // ueberhaupt pruefen laesst -- und das geht nur, wenn man sie ohne
     // Netz, ohne Ortung und ohne Einstellungen aufrufen kann.
     // tests/bodytest.cpp tut genau das.
+    static QByteArray buildComment(const QString &deviceId,
+                                   const QString &appVersion,
+                                   const QString &meldungId,
+                                   const QString &text,
+                                   const QDateTime &now);
+
     static QByteArray buildReport(const QString &deviceId,
                                   const QString &appVersion,
                                   const QString &text,
@@ -134,6 +155,7 @@ signals:
     void positionChanged();
     // Nach einer wirklich abgeschickten Meldung.
     void reportSubmitted(const QString &meldungId);
+    void commentSubmitted(const QString &meldungId);
 
 private slots:
     void replyFinished(int tag, int status, const QByteArray &body,
@@ -147,7 +169,8 @@ private:
         OneReport,
         ReverseGeocode,
         ForwardGeocode,
-        SubmitReport
+        SubmitReport,
+        SubmitComment
     };
 
     int send(Kind kind, const QString &verb, const QString &path,

@@ -346,6 +346,49 @@ QByteArray Api::buildReport(const QString &deviceId, const QString &appVersion,
     return Json::serialise(body);
 }
 
+QByteArray Api::buildComment(const QString &deviceId, const QString &appVersion,
+                             const QString &meldungId, const QString &text,
+                             const QDateTime &now)
+{
+    QVariantMap body;
+    body.insert("geraetInfoId", deviceId);
+    body.insert("appVersion", appVersion);
+    body.insert("meldungId", meldungId);
+    body.insert("kommentarText", text);
+    body.insert("erzeugtAm", stamp(now));
+    // istRedaktion gehoert der Stadt, nicht uns; geloescht ist nichts.
+    body.insert("istRedaktion", false);
+    body.insert("geloescht", false);
+    // noPushSend false: wer die Meldung verfolgt, soll den Kommentar auch
+    // bekommen -- das ist der Sinn der Sache.
+    body.insert("noPushSend", false);
+    return Json::serialise(body);
+}
+
+void Api::submitComment(const QString &meldungId, const QString &text)
+{
+    if (!ready()) {
+        setError(tr("Noch keine Gerätekennung — bitte neu starten."));
+        return;
+    }
+    if (meldungId.isEmpty() || text.trimmed().isEmpty())
+        return;
+
+    const int tag = m_nextTag++;
+    m_kinds.insert(tag, int(SubmitComment));
+    m_subjects.insert(tag, meldungId);
+    QStringList headers;
+    headers << "Accept: application/json" << "Content-Type: application/json";
+    setBusy(1);
+    // Die Abfrage `type` steht leer in der Original-App, der ApiKey-Kopf
+    // fehlt dort ganz -- siehe api.h.
+    m_http->request(tag, "PUT",
+                    QString::fromLatin1(BaseUrl) + "Kommentar?type=",
+                    buildComment(m_deviceId, QString::fromLatin1(AppVersion),
+                                 meldungId, text, QDateTime::currentDateTime()),
+                    headers);
+}
+
 QByteArray Api::reportBody(const QString &text, const QStringList &categoryIds,
                            const QStringList &photoFiles) const
 {
@@ -478,6 +521,12 @@ void Api::replyFinished(int tag, int status, const QByteArray &body,
         // Die Eigenschaften stehen schon in dieser Antwort -- kein zweiter
         // Gang zum Adressdienst.
         applyAddress(first.value("properties").toMap());
+        break;
+    }
+    case SubmitComment: {
+        emit commentSubmitted(subject);
+        // Die Meldung neu holen, damit der eigene Kommentar darunter steht.
+        fetchReport(subject);
         break;
     }
     case SubmitReport: {

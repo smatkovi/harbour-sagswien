@@ -1,6 +1,6 @@
 Name:       harbour-sagswien
 Summary:    Meldungen an die Stadt Wien
-Version:    0.1.0
+Version:    0.2.0
 Release:    1
 Group:      Qt/Qt
 License:    GPLv3+
@@ -54,5 +54,9 @@ desktop-file-install --delete-original \
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 
 %changelog
+* Thu Oct 09 2026 smatkovi <sebastian.matkovich@gmail.com> 0.2.0-1
+- Kommentieren: der Dienst braucht dafuer keinen Schluessel.
+- Auf dem N950 nachgemessen: Anmeldung, Meldungen, Fotos und Kacheln.
+
 * Thu Oct 09 2026 smatkovi <sebastian.matkovich@gmail.com> 0.1.0-1
 - Erste Fassung: Meldungen lesen, Karte, neue Meldung mit Ort und Foto.

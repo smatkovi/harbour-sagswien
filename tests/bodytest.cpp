@@ -123,8 +123,41 @@ int main(int argc, char *argv[])
     pruefe(body.contains("images"), "images fehlt");
     pruefe(body.value("images").toList().isEmpty(), "images ist nicht leer");
 
+    // ---------------------------------------------------------------
+    // Der Kommentarkoerper. Auch er wird beim Entwickeln nie abgeschickt:
+    // ein Kommentar steht oeffentlich an einer fremden Meldung.
+    // ---------------------------------------------------------------
+    const QByteArray kroh = Api::buildComment(
+                "334d5f59-a196-4804-966a-37b727cef7d9", "0.1.0",
+                "644f2c75-bc86-d6fb-60d4-000007324939",
+                "Das Loch ist seit gestern groesser.", wann);
+
+    const QVariantMap kommentar = Json::parse(kroh).toMap();
+    pruefe(kommentar.value("meldungId").toString()
+           == "644f2c75-bc86-d6fb-60d4-000007324939", "meldungId falsch");
+    pruefe(kommentar.value("kommentarText").toString()
+           == "Das Loch ist seit gestern groesser.", "kommentarText falsch");
+    pruefe(kommentar.value("geraetInfoId").toString()
+           == "334d5f59-a196-4804-966a-37b727cef7d9",
+           "die Geraetekennung fehlt im Kommentar");
+    pruefe(kommentar.value("erzeugtAm").toString().startsWith("2026-10-09T13:35:41"),
+           "erzeugtAm hat nicht die Form des Dienstes");
+    // istRedaktion gehoert der Stadt. Wer das auf true setzt, gaebe vor,
+    // die Behoerde zu sein -- es muss ausdruecklich false drinstehen.
+    pruefe(kommentar.contains("istRedaktion")
+           && kommentar.value("istRedaktion").toBool() == false,
+           "istRedaktion ist nicht ausdruecklich false");
+    pruefe(kommentar.value("noPushSend").toBool() == false,
+           "noPushSend ist nicht false");
+    // Es gibt keinen ApiKey: das Interface der App fuehrt den Kopf, die
+    // einzige Aufrufstelle uebergibt null. Im Koerper hat er nichts zu
+    // suchen.
+    pruefe(!kroh.contains("ApiKey") && !kroh.contains("apiKey"),
+           "ein ApiKey steht im Kommentarkoerper");
+
     // --- Und nichts davon darf den Dienst anfassen ---
     aus << (fehler ? QString("%1 Fehler\n").arg(fehler)
-                   : QString("Meldungskoerper in Ordnung (nichts abgeschickt)\n"));
+                   : QString("Meldungs- und Kommentarkoerper in Ordnung "
+                             "(nichts abgeschickt)\n"));
     return fehler ? 1 : 0;
 }

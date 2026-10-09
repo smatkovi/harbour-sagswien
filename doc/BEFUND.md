@@ -256,6 +256,70 @@ die Form der App geprueft; zum ersten Mal abgeschickt wird er erst, wenn
 der Nutzer absichtlich etwas Echtes melden will. Lesen (`Kategorie/All`,
 `Meldung/Filtered`, `Meldung/GetById`, Bilder) ist frei.
 
+## 11a. Kommentieren braucht keinen Schluessel
+
+Die Schnittstelle der App fuehrt einen Kopf `ApiKey`:
+
+    @qo3("Kommentar")
+    Object a(@pz1("ApiKey") String str, @t54("type") String str2, ...)
+
+In den Ressourcen steht kein Schluessel (`res/values/*` durchsucht, nichts).
+Der Grund ist einfacher: **es gibt genau eine Aufrufstelle, und die
+uebergibt `null`** (`v8.java:268`):
+
+    ((nh2) ie4Var.a).a(null, "", qh2Var, this);
+
+Retrofit laesst einen Kopf mit null-Wert ganz weg -- der Kopf wird also nie
+geschickt. Die Abfrage `type` steht leer.
+
+**Am Dienst nachgemessen (09.10.2026):** `PUT Kommentar?type=` ohne jeden
+Kopf, mit einer absichtlich ungueltigen Kennung im Koerper, antwortet mit
+**HTTP 400** -- nicht 401 und nicht 403. Es gibt also keine Sperre, nur die
+Modellpruefung. (Der Koerper war bewusst kaputt, damit nichts angelegt wird.)
+
+`KommentarDTO` beim Schreiben: meldungId, kommentarText, erzeugtAm,
+geraetInfoId, appVersion, istRedaktion (**ausdruecklich false** -- true
+hiesse, sich als die Behoerde auszugeben), geloescht false, noPushSend
+false. Fuer Kommentare gilt dieselbe Regel wie fuer Meldungen: sie stehen
+oeffentlich an einer fremden Meldung, also nicht beim Entwickeln
+abschicken.
+
+## 11b. Am N950 nachgemessen (09.10.2026)
+
+Das Paket `0.2.0-meego1` mit `aegis-dpkg -i` installiert und gelaufen:
+
+    PUT  Geraet            -> 200, geraetInfoId 465cf872-...  ("Gast 246353")
+    GET  Kategorie/All     -> 200
+    POST Meldung/Filtered  -> 200, 8357 B, Status 0 und 4
+    GET  images/BySize/.../400 -> 200, 15 493 B, beginnt mit ff d8 ff
+    GET  basemap-Kachel    -> 200, 98 909 B
+
+Damit sind der Rust-Holer, TLS 1.2 ab Harmattan, die Zahlen-Aufzaehlungen
+und die Statuszuordnung **am Geraet** belegt, nicht nur am Schreibtisch.
+
+Zwei Fallen beim Pruefen auf dem Geraet, beide gekostet:
+
+- **`pgrep -x harbour-sagswien` trifft nie.** Linux kuerzt `comm` auf 15
+  Zeichen, der Name hat 16 -- also `pkill -x harbour-sagswie`. Und
+  `pkill -f` ist hier keine Alternative: es trifft die eigene ssh-Shell
+  mit (siehe `pkill-killt-die-shell`).
+- **In `control.in` duerfen keine `#`-Kommentare stehen.** Debian-control
+  kennt keine, und es faellt erst beim Installieren auf dem Geraet auf
+  ("field name `#` must be followed by colon"), nicht beim Bauen.
+
+Und ein Fehler, den nur das Geraet zeigen konnte: **`Switch` in
+com.nokia.meego hat kein `clicked`-Signal.** Ein `onClicked` daran liess
+die ganze Einstellungsseite nicht mehr aufgehen. Der Pruefer auf dem
+Baurechner kann das strukturell nicht finden -- ihm fehlt
+com.nokia.meego, deshalb blendet er alle "is not a type"-Fehler aus, also
+genau diese Klasse. Dafuer gibt es jetzt `meego/tests/seiten-laden.sh`:
+es schiebt eine Sonde als `main.qml` unter, laesst die App jede Seite
+anlegen und legt danach zurueck.
+
+Nebenbei beantwortet: das QML-Plugin des Bildwaehlers liegt in
+`/usr/lib/qt4/imports/QtMobility/gallery` und kommt aus **`libqtm-gallery`**
+(mit `dpkg -S` nachgesehen) -- es ist ab Werk da.
+
 ## 12. Nicht noetig fuer das Ziel
 
 Firebase (Crashlytics, Remote Config, Push), Play Core (In-App-Review),

@@ -139,6 +139,25 @@ Page {
                 }
             }
 
+            SectionHeader { text: qsTr("Mitreden") }
+
+            TextArea {
+                id: eigenerKommentar
+                width: column.width
+                placeholderText: qsTr("Etwas dazu sagen …")
+                label: qsTr("Steht öffentlich an dieser Meldung")
+            }
+
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Kommentar abschicken")
+                enabled: eigenerKommentar.text.trim().length >= 3 && !Api.busy
+                onClicked: pageStack.push(Qt.resolvedUrl("ConfirmCommentPage.qml"),
+                                          { meldungId: page.summary.meldungId,
+                                            kommentar: eigenerKommentar.text,
+                                            feld: eigenerKommentar })
+            }
+
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin

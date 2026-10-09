@@ -42,6 +42,7 @@ DISTFILES += \
     qml/components/TileMap.qml \
     qml/pages/MainPage.qml \
     qml/pages/ReportPage.qml \
+    qml/pages/ConfirmCommentPage.qml \
     qml/pages/NewReportPage.qml \
     qml/pages/MapPage.qml \
     qml/pages/SettingsPage.qml \

@@ -117,6 +117,48 @@ Page {
                     Item { width: 1; height: 8 }
                 }
             }
+
+            Label {
+                x: 16
+                font.pixelSize: 20
+                color: AppTheme.grau
+                text: qsTr("Mitreden")
+            }
+
+            TextArea {
+                id: eigenerKommentar
+                x: 16
+                width: parent.width - 32
+                height: 120
+                placeholderText: qsTr("Etwas dazu sagen …")
+            }
+
+            Button {
+                x: 16
+                width: parent.width - 32
+                text: qsTr("Kommentar abschicken")
+                enabled: eigenerKommentar.text.length >= 3 && !Api.busy
+                opacity: enabled ? 1.0 : 0.4
+                onClicked: frage.open()
+            }
+
+            Item { width: 1; height: 12 }
+        }
+    }
+
+    // Zwischen dem Knopf und dem Dienst steht eine Frage: der Kommentar
+    // steht danach oeffentlich an einer fremden Meldung, und es gibt
+    // keinen Testserver.
+    QueryDialog {
+        id: frage
+        titleText: qsTr("Kommentar abschicken?")
+        message: qsTr("Er steht danach öffentlich an dieser Meldung und "
+                      + "kann von hier nicht zurückgenommen werden.")
+        acceptButtonText: qsTr("Abschicken")
+        rejectButtonText: qsTr("Abbrechen")
+        onAccepted: {
+            Api.submitComment(page.summary.meldungId, eigenerKommentar.text)
+            eigenerKommentar.text = ""
         }
     }
 

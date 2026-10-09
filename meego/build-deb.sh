@@ -57,7 +57,17 @@ cp "$HERE/LICENSE" "$STAGE/usr/share/doc/harbour-sagswien/copyright"
 find "$STAGE" -type f ! -path "*/bin/*" -exec chmod 644 {} +
 find "$STAGE" -type d -exec chmod 755 {} +
 
-# control with the icon; the base64 lines need a leading space each.
+# control mit dem Symbol; die base64-Zeilen brauchen je ein fuehrendes
+# Leerzeichen.
+#
+# **In control.in duerfen keine #-Kommentare stehen.** Debian-control
+# kennt keine, und Harmattans dpkg bricht beim Installieren ab
+# ("field name `#' must be followed by colon") -- also erst auf dem
+# Geraet, nicht beim Bauen. Anmerkungen gehoeren hierher.
+#
+# Zu den Abhaengigkeiten: libqtm-gallery liefert das QML-Plugin des
+# Bildwaehlers (/usr/lib/qt4/imports/QtMobility/gallery) -- am N950 mit
+# dpkg -S nachgesehen, es ist dort ab Werk da.
 ICON=$(base64 -w 76 "$PKG/icons/icon-64.png" | sed 's/^/ /')
 awk -v version="$VERSION" -v icon="$ICON" '
     { gsub(/@VERSION@/, version) }
