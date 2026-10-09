@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
     QApplication application(argc, argv);
     application.setOrganizationName("harbour-sagswien");
     application.setApplicationName("harbour-sagswien");
+    // Ohne das steht auf der Ueber-Seite "Fassung" und dahinter nichts.
+    application.setApplicationVersion(APP_VERSION);
 
     QTranslator translator;
     if (translator.load("harbour-sagswien-" + QLocale::system().name(),

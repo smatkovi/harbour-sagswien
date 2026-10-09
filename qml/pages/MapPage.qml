@@ -2,6 +2,14 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
 
+// Die Karte liegt **nicht** in einer SilicaFlickable.
+//
+// Sie wuerde sonst mit dem Pulley-Menue um denselben Zug streiten: die
+// Karte fuellt die ganze Seite, und sobald ein Schieben die Schwelle
+// ueberschreitet, zieht die Flickable das Menue auf statt die Karte zu
+// bewegen. TileMap haelt den Zug zwar selbst fest (preventStealing), aber
+// dann waere das Pulley gar nicht mehr erreichbar -- also gibt es hier
+// keins, und die Befehle stehen als Knoepfe auf der Leiste unten.
 Page {
     id: page
 
@@ -10,72 +18,79 @@ Page {
     // ... oder eine bestimmte Meldung zeigen.
     property var focusReport: null
 
-    SilicaFlickable {
+    TileMap {
+        id: karte
         anchors.fill: parent
+        showPin: true
+        pinLat: centerLat
+        pinLon: centerLon
+    }
 
-        PullDownMenu {
-            MenuItem {
-                text: Images.satellite ? qsTr("Stadtplan") : qsTr("Luftbild")
-                onClicked: Images.satellite = !Images.satellite
-            }
-            MenuItem {
-                text: qsTr("Zum eigenen Standort")
-                visible: Api.hasPosition
-                onClicked: karte.goTo(Api.latitude, Api.longitude)
-            }
-            MenuItem {
-                text: qsTr("Diesen Ort übernehmen")
-                visible: page.pickMode
-                onClicked: {
-                    Api.setPosition(karte.centerLat, karte.centerLon)
-                    pageStack.pop()
-                }
-            }
+    // Zoom rechts, wo der Daumen hinkommt.
+    Column {
+        anchors.right: parent.right
+        anchors.rightMargin: Theme.paddingLarge
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: Theme.paddingMedium
+
+        IconButton {
+            icon.source: "image://theme/icon-m-add"
+            onClicked: karte.zoomIn()
         }
-
-        TileMap {
-            id: karte
-            anchors.fill: parent
-            showPin: true
-            pinLat: centerLat
-            pinLon: centerLon
+        IconButton {
+            icon.source: "image://theme/icon-m-remove"
+            onClicked: karte.zoomOut()
         }
+    }
 
-        // Die Fadenkreuzmitte ist der Stecknadelkopf -- im Wahlmodus ist
-        // das, was uebernommen wird, also immer die Bildmitte.
+    Rectangle {
+        id: leiste
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: inhalt.height + 2 * Theme.paddingMedium
+        color: Theme.rgba(Theme.highlightDimmerColor, 0.9)
+
         Column {
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.paddingLarge
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.paddingMedium
-
-            IconButton {
-                icon.source: "image://theme/icon-m-add"
-                onClicked: karte.zoomIn()
-            }
-            IconButton {
-                icon.source: "image://theme/icon-m-remove"
-                onClicked: karte.zoomOut()
-            }
-        }
-
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            height: hinweis.height + 2 * Theme.paddingMedium
-            color: Theme.rgba(Theme.highlightDimmerColor, 0.85)
+            id: inhalt
+            x: Theme.horizontalPageMargin
+            width: parent.width - 2 * Theme.horizontalPageMargin
+            y: Theme.paddingMedium
+            spacing: Theme.paddingSmall
 
             Label {
-                id: hinweis
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width
                 wrapMode: Text.WordWrap
                 font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
                 text: page.pickMode
-                      ? qsTr("Karte schieben, dann oben „Diesen Ort übernehmen“")
+                      ? qsTr("Karte schieben, bis der Punkt stimmt")
                       : qsTr("Karten: basemap.at / Stadt Wien (CC BY 4.0)")
+            }
+
+            Flow {
+                width: parent.width
+                spacing: Theme.paddingMedium
+
+                Button {
+                    text: Images.satellite ? qsTr("Stadtplan") : qsTr("Luftbild")
+                    onClicked: Images.satellite = !Images.satellite
+                }
+
+                Button {
+                    text: qsTr("Mein Standort")
+                    visible: Api.hasPosition
+                    onClicked: karte.goTo(Api.latitude, Api.longitude)
+                }
+
+                Button {
+                    text: qsTr("Ort übernehmen")
+                    visible: page.pickMode
+                    onClicked: {
+                        Api.setPosition(karte.centerLat, karte.centerLon)
+                        pageStack.pop()
+                    }
+                }
             }
         }
     }

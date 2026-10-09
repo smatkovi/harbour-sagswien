@@ -112,6 +112,12 @@ Item {
 
     MouseArea {
         anchors.fill: parent
+        // Ohne das schnappt ein Flickable darueber den Zug weg, sobald er
+        // die Schwelle ueberschreitet -- auf Sailfish zoege dann jedes
+        // Schieben der Karte das Pulley-Menue auf statt die Karte.
+        // preventStealing gibt es seit QtQuick 1.1, der Rumpf dient also
+        // weiter beiden Ausgaben.
+        preventStealing: true
         property real lastX: 0
         property real lastY: 0
 

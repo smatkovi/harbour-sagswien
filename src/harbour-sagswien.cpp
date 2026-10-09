@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
     // anderen, leeren Speicher -- und die Geraetekennung ist weg.
     application->setOrganizationName("harbour-sagswien");
     application->setApplicationName("harbour-sagswien");
+    // Ohne das steht auf der Ueber-Seite "Fassung" und dahinter nichts.
+    application->setApplicationVersion(APP_VERSION);
 
     Settings settings;
     Api api(&settings);
