@@ -1,0 +1,24 @@
+Package: harbour-sagswien
+Version: @VERSION@
+Architecture: armel
+Maintainer: Sebastian Matkovich <sebastian.matkovich@gmail.com>
+Depends: libqtcore4, libqtgui4, libqt4-network, libqt4-dbus, libqt4-declarative, libqtm-location, libqtm-gallery, libmeegotouchcore0, qt-components
+Section: user/network
+Priority: optional
+Aegis-Manifest: included
+Description: Meldungen an die Stadt Wien
+ Ein eigener Client fuer den Meldungsdienst "Sag's Wien". Zeigt die
+ Meldungen in der Naehe, alle und die eigenen, mit Fotos, Stand der
+ Bearbeitung und den Antworten der Stadt, und gibt neue Meldungen mit Ort
+ und Foto auf.
+ .
+ Die MeeGo-Harmattan-Ausgabe: Qt 4.7 mit com.nokia.meego statt Silica,
+ derselbe Kern wie die Sailfish-Ausgabe. Das HTTPS macht ein eigener
+ kleiner Holer (sagswien-fetch), weil Qt 4.7s OpenSSL die heutigen
+ Server der Stadt Wien nicht mehr erreicht.
+ .
+ Weder von der Stadt Wien noch vom Magistrat herausgegeben oder
+ unterstuetzt.
+Maemo-Display-Name: Sag's Wien
+XB-Maemo-Icon-26:
+@ICON@

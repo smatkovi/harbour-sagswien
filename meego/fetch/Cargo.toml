@@ -1,0 +1,21 @@
+[package]
+name = "sagswien-fetch"
+version = "0.1.0"
+edition = "2021"
+description = "Eine HTTPS-Anfrage fuer die MeeGo-Ausgabe von Sag's Wien"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+# Warum es diesen Holer gibt: Harmattans Qt 4 sitzt auf einem OpenSSL von
+# 2011 und kommt mit stp.wien.gv.at nicht durch den Handschlag -- gemessen
+# am 09.10.2026: der Server lehnt TLS 1.0 und 1.1 ab und will mindestens
+# 1.2 (ECDHE-RSA-AES256-GCM-SHA384). rustls spricht 1.2 und 1.3 selbst,
+# und webpki-roots bringt die Wurzeln mit; der Zertifikatsspeicher des
+# Geraets ist genauso alt wie sein OpenSSL.
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls-webpki-roots", "gzip", "cookies"] }
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1

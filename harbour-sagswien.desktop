@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=harbour-sagswien
+Exec=harbour-sagswien
+Name=Sag's Wien
+Name[de]=Sag's Wien
+
+[X-Sailjail]
+OrganizationName=harbour-sagswien
+ApplicationName=harbour-sagswien
+Permissions=Internet;Location;Pictures

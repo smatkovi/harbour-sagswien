@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Sag's Wien
+Name[de]=Sag's Wien
+Comment=Meldungen an die Stadt Wien
+Exec=/opt/harbour-sagswien/bin/harbour-sagswien
+Icon=/usr/share/icons/hicolor/80x80/apps/harbour-sagswien.png
+Categories=Network;Utility;
+X-MeeGo-Logical-Id=
+X-MeeGo-Translation-Catalog=

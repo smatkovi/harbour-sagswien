@@ -1,0 +1,6 @@
+/build/
+*.o
+*.d
+moc_*.cpp
+tools/original/*.png
+tools/original/*.svg

@@ -1,0 +1,11 @@
+<aegis>
+    <request policy="add">
+        <!-- Der Sitzungsbus gibt com.nokia.positioningd.client nur an
+             einen Prozess heraus, der Location traegt; ohne diese Zeile
+             bleibt die Position ewig ungueltig, und zwar stumm.
+             Belegt: modRana 0.43.4 (fremdes, selbst verteiltes Paket)
+             fuehrt dieselbe Zeile und bekam am N9/N950 die Position. -->
+        <credential name="Location" />
+        <for path="/opt/harbour-sagswien/bin/harbour-sagswien" />
+    </request>
+</aegis>
