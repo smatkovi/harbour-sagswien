@@ -17,4 +17,8 @@ ApplicationName=harbour-sagswien
 # Tracker3 -- den gibt erst MediaIndexing frei. Ohne sie bleibt die
 # Seite "Foto hinzufuegen" schwarz. Jede installierte App mit diesem
 # Waehler fuehrt die Berechtigung (Whisperfish, SeaPrint, Fernschreiber).
-Permissions=Internet;Location;Pictures;MediaIndexing
+#
+# RemovableMedia fuer Fotos auf der Speicherkarte: es hebt firejails
+# disable-mnt auf, sonst ist /run/media im Sandkasten nicht da, und
+# horcht per UDisks mit, wann eine Karte kommt und geht.
+Permissions=Internet;Location;Pictures;MediaIndexing;RemovableMedia

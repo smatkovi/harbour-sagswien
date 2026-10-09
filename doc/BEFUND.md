@@ -351,6 +351,12 @@ Stadt-Wien-Konto, `stadtWienKontoId`.
   mit diesem Waehler fuehrt sie (Whisperfish, SeaPrint, Fernschreiber,
   RooTelegram), unsere war die einzige ohne.
   Liegen Fotos auf der Speicherkarte, braucht es zusaetzlich
-  `RemovableMedia`.
+  **`RemovableMedia`**: das hebt firejails `disable-mnt` auf (sonst ist
+  `/run/media/<nutzer>` im Sandkasten schlicht nicht da) und horcht per
+  UDisks mit, wann eine Karte kommt und geht. Die Endfassung ist damit
+  `Internet;Location;Pictures;MediaIndexing;RemovableMedia`.
+  Was `Pictures` schon abdeckt und wofuer man **kein** RemovableMedia
+  braucht: `~/Pictures` **und** `~/android_storage/Pictures` sowie
+  `~/android_storage/DCIM` stehen dort ausdruecklich in der Weissliste.
 - Der `ApiKey` fuer `Kommentar` ist noch unbekannt (in `res/values`?) —
   wird erst gebraucht, wenn Kommentieren dazukommt
