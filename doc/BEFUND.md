@@ -341,5 +341,16 @@ Stadt-Wien-Konto, `stadtWienKontoId`.
 - SFOS: `OrganizationName = ApplicationName = harbour-sagswien` in main.cpp
   **und** im `[X-Sailjail]`-Block (`sailfish-settings-sandbox`),
   Kennung in `AppDataLocation`
+- SFOS-Berechtigungen: `Internet;Location;Pictures;MediaIndexing`.
+  **MediaIndexing ist nicht optional**, sobald ein Bildwaehler dabei ist:
+  `Pictures` gibt nur den Dateizugriff, aber `ImagePickerPage` listet
+  ueber `QtDocGallery`/`DocumentGalleryModel`, und das redet per D-Bus mit
+  Tracker3 -- freigegeben allein von `MediaIndexing`
+  (`dbus-user.talk org.freedesktop.Tracker3.Miner.Files`). Ohne sie bleibt
+  die Seite schwarz, ohne Fehlermeldung. Gegenprobe: jede installierte App
+  mit diesem Waehler fuehrt sie (Whisperfish, SeaPrint, Fernschreiber,
+  RooTelegram), unsere war die einzige ohne.
+  Liegen Fotos auf der Speicherkarte, braucht es zusaetzlich
+  `RemovableMedia`.
 - Der `ApiKey` fuer `Kommentar` ist noch unbekannt (in `res/values`?) —
   wird erst gebraucht, wenn Kommentieren dazukommt

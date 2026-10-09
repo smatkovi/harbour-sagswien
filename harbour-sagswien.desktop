@@ -7,6 +7,14 @@ Name=Sag's Wien
 Name[de]=Sag's Wien
 
 [X-Sailjail]
+# OrganizationName und ApplicationName muessen zu main.cpp passen, sonst
+# bekommt die App im Sandkasten bei jedem Start einen leeren Speicher.
 OrganizationName=harbour-sagswien
 ApplicationName=harbour-sagswien
-Permissions=Internet;Location;Pictures
+# MediaIndexing ist fuer den Bildwaehler noetig, nicht nur Pictures:
+# Pictures gibt den Dateizugriff, aber ImagePickerPage listet ueber
+# QtDocGallery/DocumentGalleryModel, und das redet per D-Bus mit
+# Tracker3 -- den gibt erst MediaIndexing frei. Ohne sie bleibt die
+# Seite "Foto hinzufuegen" schwarz. Jede installierte App mit diesem
+# Waehler fuehrt die Berechtigung (Whisperfish, SeaPrint, Fernschreiber).
+Permissions=Internet;Location;Pictures;MediaIndexing
