@@ -316,9 +316,74 @@ genau diese Klasse. Dafuer gibt es jetzt `meego/tests/seiten-laden.sh`:
 es schiebt eine Sonde als `main.qml` unter, laesst die App jede Seite
 anlegen und legt danach zurueck.
 
-Nebenbei beantwortet: das QML-Plugin des Bildwaehlers liegt in
-`/usr/lib/qt4/imports/QtMobility/gallery` und kommt aus **`libqtm-gallery`**
-(mit `dpkg -S` nachgesehen) -- es ist ab Werk da.
+Nebenbei beantwortet: das QML-Plugin der Galerie liegt in
+`/usr/lib/qt4/imports/QtMobility/gallery` und kommt aus `libqtm-gallery`
+(mit `dpkg -S` nachgesehen) -- es ist ab Werk da. **Nuetzt uns aber
+nichts**, siehe gleich.
+
+## 11c. Der Bildwaehler kann die Galerie nicht nehmen
+
+`DocumentGalleryModel` lieferte am N950 **0 Treffer**, obwohl 961
+Bilddateien auf dem Geraet liegen und Tracker 224 davon indiziert hat
+(`tracker-stats`: `nfo:Image = 224`, `nmm:Photo = 51`). Kein Fehlertext,
+nur ein leeres Modell.
+
+Die Ursache steht in einer Zeile:
+
+    $ ls -ld ~/.cache/tracker
+    d---rwx---  metadata-users metadata-users
+
+Der **Eigentuemer hat keine Rechte**, nur die Gruppe -- und `user` ist
+nicht darin. QtMobilitys Galerie liest den Index naemlich unmittelbar aus
+dieser Datenbank (QtSparql hat beide Treiber, `libqsparqltracker.so` ueber
+D-Bus und `libqsparqltrackerdirect.so` direkt; die Galerie nimmt den
+direkten). Dass `tracker-sparql` auf der Kommandozeile brav 224 meldet,
+fuehrt deshalb in die Irre: das geht ueber D-Bus.
+
+Belegt durch Gegenprobe: derselbe Lauf als root gibt
+
+    Image (ohne Eigenschaften)      51     <- entspricht nmm:Photo
+    File + mimeType image/*       1709
+    als `user`, alles davon           0
+
+**Das Token im eigenen Manifest hilft nicht.** `GRP::metadata-users` im
+`_aegis` laesst sich zwar installieren, aber der Prozess bekommt die
+Gruppe nicht (`id` zeigt sie nicht, die Galerie liefert weiter 0) --
+genau wie `aegis-keine-faehigkeiten-selbstgebaut` es fuer selbstgebaute
+Pakete sagt. Anders als das Resource-Token `Location`, das sehr wohl
+gewaehrt wird.
+
+**Der Weg ist das Dateisystem.** Die Bilddateien selbst sind fuer `user`
+lesbar, und `Qt.labs.folderlistmodel` ist ab Werk da (in
+`libqt4-declarative`). `meego/qml/PhotoPicker.qml` zeigt deshalb die drei
+Bilderordner (`MyDocs/DCIM`, `MyDocs/Pictures`, `MyDocs/Downloads`) mit
+einem `FolderListModel`. Keine Rechte noetig, und man sieht auch, was
+nicht im Index steht.
+
+Drei Eigenheiten von Qt 4.7s FolderListModel, am Geraet nachgesehen:
+
+- **`filePath` ist bereits eine URL** (`file:///home/user/...`), kein
+  nackter Pfad. Ein vorangestelltes `file://` ergibt
+  `file://file:///...` und ein leeres Bild; fuer `QImage::load` muss man
+  die sieben Zeichen umgekehrt abschneiden.
+- **`get()` gibt es noch nicht** -- Rollen liest man nur im Delegate.
+- Es gibt **keine Rolle, die Ordner von Dateien unterscheidet**
+  (`fileIsDir` kam erst spaeter). Ein Baum zum Durchblaettern waere
+  deshalb Bastelei; feste Ordnerknoepfe sind hier ohnehin das Bessere.
+
+## 11d. aegis: ein Kommentar kann das Paket kippen
+
+Zwischendurch lehnte aegis das Paket ab:
+
+    aegis aborting dpkg -- all listed package files rejected
+
+Es sah nach einer verweigerten Berechtigung aus, war aber **kaputtes XML**:
+im Kommentar des Manifests stand ein doppelter Bindestrich (`d---rwx---`
+und ein `--` im Fliesstext), und den duerfen XML-Kommentare nicht
+enthalten. Im Manifest also `&#45;` schreiben, und vor dem Bauen
+`python3 -c "import xml.etree.ElementTree as ET; ET.parse('meego/_aegis')"`
+laufen lassen. Dieselbe Falle wie bei den zbus-Doc-Kommentaren
+(`telepathy-kennung-statt-name`).
 
 ## 12. Nicht noetig fuer das Ziel
 

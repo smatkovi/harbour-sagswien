@@ -208,9 +208,8 @@ Page {
                 font.pixelSize: 16
                 color: AppTheme.rotDunkel
                 visible: bildwahl.status === Loader.Error
-                text: qsTr("Die Galerie laesst sich nicht oeffnen "
-                           + "(QtMobility.gallery fehlt). Melden geht "
-                           + "trotzdem, nur ohne Foto.")
+                text: qsTr("Der Bildwähler lässt sich nicht öffnen. "
+                           + "Melden geht trotzdem, nur ohne Foto.")
             }
 
             Label {
@@ -228,11 +227,10 @@ Page {
 
     ScrollDecorator { flickableItem: rolle }
 
-    // Der Bildwaehler haengt an "import QtMobility.gallery 1.1", und das
-    // Plugin steckt in einem eigenen Paket. Faellt der Import aus, soll
-    // **nur der Fotoknopf** verschwinden -- nicht diese ganze Seite, und
-    // damit das Melden ueberhaupt. Also ueber einen Loader statt
-    // unmittelbar: ein Fehler bleibt dann im Loader stecken.
+    // Ueber einen Loader, nicht unmittelbar: faellt der Bildwaehler aus
+    // welchem Grund auch immer aus, soll **nur der Fotoknopf**
+    // verschwinden -- nicht diese ganze Seite, und damit das Melden
+    // ueberhaupt. Ein Fehler bleibt dann im Loader stecken.
     Loader {
         id: bildwahl
         source: "PhotoPicker.qml"

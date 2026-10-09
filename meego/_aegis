@@ -6,6 +6,22 @@
              Belegt: modRana 0.43.4 (fremdes, selbst verteiltes Paket)
              fuehrt dieselbe Zeile und bekam am N9/N950 die Position. -->
         <credential name="Location" />
+
+        <!-- Kein GRP::metadata&#45;users, obwohl es naheliegt: QtMobilitys
+             Galerie liest den Tracker&#45;Index unmittelbar aus
+             ~/.cache/tracker, und das Verzeichnis gehoert jener Gruppe.
+             Am N950 durchgespielt: mit dem Token im Manifest laesst sich
+             das Paket zwar installieren, der Prozess bekommt die Gruppe
+             aber trotzdem nicht (id zeigt sie nicht, die Galerie liefert
+             weiter 0 Treffer). Ein selbstgebautes Paket holt sich so
+             keine fremden Rechte. Der Bildwaehler geht deshalb ueber das
+             Dateisystem, siehe meego/qml/PhotoPicker.qml.
+
+             Und eine Falle am Rande: in einem XML&#45;Kommentar darf kein
+             doppelter Bindestrich stehen. Steht einer darin, verwirft
+             aegis das ganze Paket mit "aegis aborting dpkg", und es
+             sieht aus, als laege es an der Berechtigung. -->
+
         <for path="/opt/harbour-sagswien/bin/harbour-sagswien" />
     </request>
 </aegis>

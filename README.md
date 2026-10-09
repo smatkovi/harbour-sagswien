@@ -55,13 +55,22 @@ findet den Rest. Es hat prompt eins gefunden: `Switch` hat dort kein
 `clicked`, und ein `onClicked` daran ließ die Einstellungsseite gar nicht
 mehr aufgehen.
 
-### Zwei Dinge, die nicht offensichtlich sind
+### Drei Dinge, die nicht offensichtlich sind
 
 **Auf dem N9 holt ein eigenes Programm die Daten.** Qt 4.7 dort sitzt auf
 einem OpenSSL von 2011; `stp.wien.gv.at` lehnt TLS 1.0 und 1.1 ab. Die
 Anfragen gehen deshalb durch `sagswien-fetch` (Rust, rustls, statisch
 gegen musl) — dieselbe Lösung wie bei Pass Viewer. Auf Sailfish genügt
 das System-Qt.
+
+**Der Bildwähler auf dem N9 geht nicht über die Galerie.** QtMobilitys
+`DocumentGalleryModel` liefert dort als gewöhnlicher Benutzer null
+Treffer: es liest den Tracker-Index unmittelbar aus `~/.cache/tracker`,
+und das Verzeichnis gehört der Gruppe `metadata-users` — der Eigentümer
+selbst hat keine Rechte darauf. Sich die Gruppe im aegis-Manifest zu
+holen, nützt nichts (ein selbstgebautes Paket bekommt sie nicht).
+Der Wähler geht deshalb über `Qt.labs.folderlistmodel` direkt durch die
+Bilderordner.
 
 **Es gibt keinen Testserver.** `PUT Meldung` legt eine echte Beschwerde
 beim Magistrat an, und ein Kommentar steht öffentlich an einer fremden

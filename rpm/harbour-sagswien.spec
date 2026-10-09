@@ -1,6 +1,6 @@
 Name:       harbour-sagswien
 Summary:    Meldungen an die Stadt Wien
-Version:    0.2.2
+Version:    0.2.3
 Release:    1
 Group:      Qt/Qt
 License:    GPLv3+
@@ -54,6 +54,10 @@ desktop-file-install --delete-original \
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 
 %changelog
+* Thu Oct 09 2026 smatkovi <sebastian.matkovich@gmail.com> 0.2.3-1
+- N9/N950: Bildwaehler ueber das Dateisystem statt ueber die Galerie --
+  deren Index ist fuer eine gewoehnliche App nicht lesbar.
+
 * Thu Oct 09 2026 smatkovi <sebastian.matkovich@gmail.com> 0.2.2-1
 - RemovableMedia dazu: Fotos auf der Speicherkarte waehlbar.
 

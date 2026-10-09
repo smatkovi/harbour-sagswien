@@ -65,9 +65,11 @@ find "$STAGE" -type d -exec chmod 755 {} +
 # ("field name `#' must be followed by colon") -- also erst auf dem
 # Geraet, nicht beim Bauen. Anmerkungen gehoeren hierher.
 #
-# Zu den Abhaengigkeiten: libqtm-gallery liefert das QML-Plugin des
-# Bildwaehlers (/usr/lib/qt4/imports/QtMobility/gallery) -- am N950 mit
-# dpkg -S nachgesehen, es ist dort ab Werk da.
+# Zu den Abhaengigkeiten: libqtm-gallery steht bewusst **nicht** drin.
+# Der Bildwaehler ging urspruenglich ueber QtMobilitys Galerie, liefert
+# dort als `user` aber nichts (der Tracker-Index gehoert metadata-users);
+# er geht jetzt ueber Qt.labs.folderlistmodel, und das steckt in
+# libqt4-declarative.
 ICON=$(base64 -w 76 "$PKG/icons/icon-64.png" | sed 's/^/ /')
 awk -v version="$VERSION" -v icon="$ICON" '
     { gsub(/@VERSION@/, version) }
